@@ -258,47 +258,69 @@ function procesarMultiplesExtras(input) {
     }
 }
 
-// GENERACIÓN DE PDF SIGUIENDO EL MODELO DE EXCEL EXCLUSIVAMENTE
+// GENERACIÓN DE PDF SIGUIENDO EL MODELO DE EXCEL CON MARCOS Y DNIs VERTICALES
 function generarReportePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
     
-    const maxAncho = 210; const maxAlto = 297; const margen = 10;
+    const maxAncho = 210; 
+    const maxAlto = 297; 
+    const margen = 10;
 
+    // Función interna para dibujar la estructura base con marcos de celda tipo Excel
     function aplicarMarcoYEncabezadoExcel(numPagina) {
-        // Marco de la celda externa del Excel
-        doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.6);
+        // 1. Marco perimetral de la hoja externa
+        doc.setDrawColor(22, 35, 47); 
+        doc.setLineWidth(0.6);
         doc.rect(margen, margen, maxAncho - (margen * 2), maxAlto - (margen * 2));
         
-        // Cabecera Combinada de Celdas
-        doc.setFillColor(255, 255, 255); doc.rect(margen + 2, margen + 2, 45, 16, 'F');
-        doc.addImage("https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical.png", "PNG", margen + 4, margen + 3, 40, 14);
+        // 2. MARCO DEL ENCABEZADO SUPERIOR (Celdas unificadas de arriba)
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(22, 35, 47);
+        doc.rect(margen + 2, margen + 2, maxAncho - (margen * 2) - 4, 18); // Caja contenedora del header
 
-        // Bloque del Título de Celda Excel Central
-        doc.setFont("Helvetica", "Bold"); doc.setFontSize(11); doc.setTextColor(22, 35, 47);
-        doc.text("LEVANTAMIENTO DE ILEGALES", 125, margen + 7, { align: "center" });
-        doc.setFontSize(10); doc.text(`SECTOR ${sectorActivo.toUpperCase()}`, 125, margen + 12, { align: "center" });
+        // Línea divisoria interna para el logo
+        doc.line(margen + 47, margen + 2, margen + 47, margen + 20);
+        // Línea divisoria interna para el cuadro de control (Código/Versión)
+        doc.line(165, margen + 2, 165, margen + 20);
 
-        // Cuadrícula Informativa de Control a la Derecha
-        doc.setLineWidth(0.2); doc.setDrawColor(180, 180, 180);
-        doc.rect(170, margen + 2, 28, 16);
-        doc.setFontSize(7); doc.setFont("Helvetica", "Normal");
-        doc.text("Código: [Vacío]", 172, margen + 6);
-        doc.text("Versión: 1", 172, margen + 11);
-        doc.text(`Fecha: ${document.getElementById("campo-fecha").value}`, 172, margen + 15);
+        // Imagen del Logo
+        doc.setFillColor(255, 255, 255);
+        doc.addImage("https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical.png", "PNG", margen + 4, margen + 4, 39, 14);
 
-        // Footer Informativo
-        doc.setFontSize(7); doc.setTextColor(140, 140, 140);
-        doc.text(`Pagina ${numPagina}`, maxAncho - margen - 15, maxAlto - margen - 4);
+        // Título Central
+        doc.setFont("Helvetica", "Bold"); 
+        doc.setFontSize(11); 
+        doc.setTextColor(22, 35, 47);
+        doc.text("LEVANTAMIENTO DE ILEGALES", 106, margen + 8, { align: "center" });
+        doc.setFontSize(10); 
+        doc.text(`SECTOR ${sectorActivo.toUpperCase()}`, 106, margen + 14, { align: "center" });
+
+        // Cuadrícula Informativa de Control Derecha (Líneas horizontales internas)
+        doc.line(165, margen + 8, maxAncho - margen - 2, margen + 8);
+        doc.line(165, margen + 14, maxAncho - margen - 2, margen + 14);
+
+        doc.setFontSize(8); 
+        doc.setFont("Helvetica", "Normal");
+        doc.text("Código:", 167, margen + 6);   // Vacío
+        doc.text("Versión: 1", 167, margen + 12);
+        doc.text("Fecha:", 167, margen + 18);    // Vacío
+
+        // Footer de la página
+        doc.setFontSize(8); 
+        doc.setTextColor(140, 140, 140);
+        doc.text(`Página ${numPagina}`, maxAncho - margen - 15, maxAlto - margen - 4);
     }
 
-    // ================= PÁGINA 1: DATOS Y DNI CARD =================
+    // ================= PÁGINA 1: DATOS Y DNIs VERTICALES =================
     aplicarMarcoYEncabezadoExcel(1);
     
-    doc.setFont("Helvetica", "Bold"); doc.setFontSize(9); doc.setTextColor(0, 0, 0);
-    doc.text("Aquí va toda la información:", margen + 5, margen + 26);
+    doc.setFont("Helvetica", "Bold"); 
+    doc.setFontSize(10); 
+    doc.setTextColor(0, 0, 0);
+    doc.text("Aquí va toda la información:", margen + 4, margen + 25);
 
-    let y = margen + 32;
+    // Arreglo de campos a imprimir
     const datosMapeados = [
         ["FECHA:", document.getElementById("campo-fecha").value],
         ["ENCARGADO DEL LEVANTAMIENTO:", document.getElementById("campo-encargado").value.toUpperCase()],
@@ -312,77 +334,127 @@ function generarReportePDF() {
         ["REFERENCIA DE LA VIVIENDA:", document.getElementById("lugar-referencia").value.toUpperCase()]
     ];
 
+    let inicioYTabla = margen + 28;
+    let anchoTabla = maxAncho - (margen * 2) - 8; // 182 mm
+    let altoFilaFija = 6.5;
+    let yActual = inicioYTabla;
+
+    // Dibujar el marco exterior contenedor para toda la información general
+    doc.setDrawColor(22, 35, 47);
+    doc.setLineWidth(0.4);
+
+    // Procesar filas calculando la altura dinámica por si la referencia es larga
     datosMapeados.forEach(([campo, valor]) => {
-        doc.setFont("Helvetica", "Bold"); doc.text(campo, margen + 8, y);
+        let esReferencia = campo.includes("REFERENCIA");
+        let lineasDeTexto = doc.splitTextToSize(valor, 115);
+        let altoFilaActual = esReferencia ? (lineasDeTexto.length * 4.5) + 3 : altoFilaFija;
+
+        // Dibujar celda (marco de la fila)
+        doc.rect(margen + 4, yActual, anchoTabla, altoFilaActual);
+        // Línea vertical que separa la columna "Etiqueta" del "Valor"
+        doc.line(margen + 62, yActual, margen + 62, yActual + altoFilaActual);
+
+        // Imprimir Texto
+        doc.setFont("Helvetica", "Bold");
+        doc.setFontSize(8.5);
+        doc.text(campo, margen + 7, yActual + 4.5);
+
         doc.setFont("Helvetica", "Normal");
-        
-        if (campo.includes("REFERENCIA")) {
-            const splitTxt = doc.splitTextToSize(valor, 115);
-            doc.text(splitTxt, margen + 65, y);
-            y += (splitTxt.length * 4) + 4;
+        if (esReferencia) {
+            doc.text(lineasDeTexto, margen + 65, yActual + 4.5);
         } else {
-            doc.text(valor, margen + 65, y);
-            y += 6.5;
+            doc.text(valor, margen + 65, yActual + 4.5);
         }
+
+        yActual += altoFilaActual;
     });
 
-    // Separación e Inyección de Fotos DNI según tamaño de celda exacto de tarjeta (85.6mm x 54mm)
-    y = Math.max(y + 5, 115); 
-    doc.setFont("Helvetica", "Bold"); doc.setFontSize(8);
+    // Posición para las fotos de los DNI de forma estrictamente VERTICAL
+    yActual += 6; 
+    doc.setFont("Helvetica", "Bold"); 
+    doc.setFontSize(9);
     
+    // Ancho y alto estándar de una tarjeta de identificación (85.6 mm x 54 mm)
+    const anchoDNI = 85.6;
+    const altoDNI = 54;
+    const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2); // Centrado exacto en la página
+
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", margen + 8, y);
-        doc.addImage(datosFotos.dniFrontal, "JPEG", margen + 8, y + 3, 85.6, 54);
+        doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        yActual += 2;
+        // Imagen + Marco perimetral de la foto
+        doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
+        doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI);
+        yActual += altoDNI + 6;
     }
+    
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", margen + 102, y);
-        doc.addImage(datosFotos.dniRevers, "JPEG", margen + 102, y + 3, 85.6, 54);
+        doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        yActual += 2;
+        // Imagen + Marco perimetral de la foto
+        doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
+        doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI);
     }
 
-    // ================= PÁGINA 2: FACHADA Y MEDIDOR =================
+    // ================= PÁGINA 2: FACHADA Y MEDIDOR CON MARCOS =================
     doc.addPage();
     aplicarMarcoYEncabezadoExcel(2);
 
-    // Foto Fachada: 160 mm × 100 mm
-    let y2 = margen + 26;
+    let yPag2 = margen + 25;
     doc.setFont("Helvetica", "Bold"); doc.setFontSize(9);
-    doc.text("FOTO FACHADA: 160 mm × 100 mm", margen + 5, y2);
+    
+    // Foto Fachada: 160 mm × 100 mm con su respectivo marco
+    doc.text("FOTO FACHADA: 160 mm × 100 mm", margen + 5, yPag2);
     if(datosFotos.fachada) {
-        doc.addImage(datosFotos.fachada, "JPEG", margen + 15, y2 + 4, 160, 100);
+        let xFachada = (maxAncho / 2) - 80;
+        doc.addImage(datosFotos.fachada, "JPEG", xFachada, yPag2 + 3, 160, 100);
+        doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
+        doc.rect(xFachada, yPag2 + 3, 160, 100); // Marco de la foto fachada
     }
 
-    // Foto Medidor: 70 mm × 100 mm (Centrado Estilo Celda Excel)
-    y2 += 112;
-    doc.text("FOTO BASE DEL MEDIDOR: 70 mm × 100 mm", margen + 5, y2);
+    // Foto Medidor: 70 mm × 100 mm con su respectivo marco
+    yPag2 += 114;
+    doc.text("FOTO BASE DEL MEDIDOR: 70 mm × 100 mm", margen + 5, yPag2);
     if(datosFotos.medidor) {
-        doc.addImage(datosFotos.medidor, "JPEG", (maxAncho / 2) - 35, y2 + 4, 70, 100);
+        let xMedidor = (maxAncho / 2) - 35;
+        doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 70, 100);
+        doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
+        doc.rect(xMedidor, yPag2 + 3, 70, 100); // Marco de la foto medidor
     }
 
-    // ================= PÁGINAS 3+: OTRAS FOTOS EXTRAS =================
+    // ================= PÁGINAS 3+: OTRAS FOTOS EXTRAS CON MARCOS =================
     if (datosFotos.extras.length > 0) {
-        let pAct = 3;
-        let subIndex = 0;
+        let paginaExtraActiva = 3;
+        let conteoFotosPorPagina = 0;
+        let yFotosExtras = margen + 25;
         
-        datosFotos.extras.forEach((imgExtra, i) => {
-            if (subIndex === 0) {
+        datosFotos.extras.forEach((imgExtra, indice) => {
+            if (conteoFotosPorPagina === 0) {
                 doc.addPage();
-                aplicarMarcoYEncabezadoExcel(pAct);
-                y2 = margen + 26;
+                aplicarMarcoYEncabezadoExcel(paginaExtraActiva);
+                yFotosExtras = margen + 25;
             }
 
             doc.setFont("Helvetica", "Bold"); doc.setFontSize(9);
-            doc.text(`OTRAS FOTOS ${i + 1}: 160 mm × 100 mm`, margen + 5, y2);
-            doc.addImage(imgExtra, "JPEG", margen + 15, y2 + 4, 160, 100);
+            doc.text(`OTRAS FOTOS ${indice + 1}: 160 mm × 100 mm`, margen + 5, yFotosExtras);
             
-            y2 += 112;
-            subIndex++;
+            let xExtra = (maxAncho / 2) - 80;
+            doc.addImage(imgExtra, "JPEG", xExtra, yFotosExtras + 3, 160, 100);
+            doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
+            doc.rect(xExtra, yFotosExtras + 3, 160, 100); // Marco de la foto adicional
+            
+            yFotosExtras += 114;
+            conteoFotosPorPagina++;
 
-            if (subIndex === 2 && i < datosFotos.extras.length - 1) {
-                subIndex = 0; pAct++;
+            if (conteoFotosPorPagina === 2 && indice < datosFotos.extras.length - 1) {
+                conteoFotosPorPagina = 0; 
+                paginaExtraActiva++;
             }
         });
     }
 
-    const nArchivo = `Levantamiento_${sectorActivo.toUpperCase()}_${document.getElementById("campo-usuario").value.replace(/\s+/g, '_')}.pdf`;
+    // Abrir visor de impresión nativo de la orden armada
     window.open(doc.output('bloburl'), '_blank');
 }
