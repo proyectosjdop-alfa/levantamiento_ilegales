@@ -1,80 +1,83 @@
 :root {
     --bg: #0f1a24;
     --card: #16232f;
-    --accent: #f4c430; /* Amarillo Institucional ENEE */
+    --accent: #f4c430; 
     --text: #ffffff;
     --border: #2c3e50;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    margin: 0;
-    padding: 15px;
+    margin: 0; padding: 12px;
 }
 
 .container {
-    max-width: 500px;
+    max-width: 520px;
     margin: auto;
 }
 
 header {
     text-align: center;
     padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 header h1 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: var(--accent);
-    text-transform: uppercase;
-    margin-top: 10px;
+    margin: 5px 0;
 }
 
-.card {
+.logo-box {
+    background: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.logo-box img {
+    max-height: 55px;
+}
+
+.card, .card_seccion {
     background: var(--card);
-    padding: 20px;
-    border-radius: 12px;
+    padding: 15px;
+    border-radius: 10px;
     border: 1px solid var(--border);
+    margin-bottom: 15px;
 }
 
-.card h3 {
+.card_seccion h3 {
     margin-top: 0;
     color: var(--accent);
-    font-size: 1.1rem;
+    font-size: 1rem;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-align: left;
 }
 
 .form-group label {
     display: block;
-    font-size: 0.85rem;
-    color: #c7d1d8;
-    margin-bottom: 5px;
+    font-size: 12px;
+    margin-bottom: 4px;
     font-weight: bold;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+input, select, textarea {
     width: 100%;
     padding: 10px;
-    background: #0f1a24;
+    background: #1b2a36;
     border: 1px solid var(--border);
+    color: #fff;
     border-radius: 6px;
-    color: white;
-    font-size: 0.9rem;
+    font-size: 13px;
     box-sizing: border-box;
-}
-
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    border-color: var(--accent);
-    outline: none;
 }
 
 .grid-2 {
@@ -83,56 +86,52 @@ header h1 {
     gap: 10px;
 }
 
-.foto-input-group {
-    margin-bottom: 15px;
-    background: #1b2a36;
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.btn-enviar, .btn-gps {
+    width: 100%;
     padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-enviar { background: var(--accent); color: #000; }
+.btn-gps { background: #3498db; color: #fff; }
+
+.foto-input-group {
+    background: #1b2a36;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px dashed var(--accent);
 }
 
 .foto-input-group span {
     font-size: 11px;
-    color: #c7d1d8;
     font-weight: bold;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
 .preview-box {
-    width: 100%;
-    height: 90px;
+    height: 70px;
     background: #0f1a24;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 2px dashed var(--accent);
     margin-top: 5px;
-    font-size: 0.8rem;
-    color: #8899a6;
+    display: flex; align-items: center; justify-content: center;
 }
 
-.preview-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.preview-box-grande {
+    height: 140px;
+    background: #0f1a24;
+    margin-top: 5px;
 }
 
-.btn-enviar {
-    background: var(--accent);
-    color: #000;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: 0.2s;
-}
-
-.btn-enviar:active {
-    transform: scale(0.98);
+.preview-box img, .preview-box-grande img {
+    width: 100%; height: 100%; object-fit: contain;
 }
