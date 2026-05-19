@@ -3,208 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENEE-UTCD - Poda Comunitaria</title>
-    <!-- Estilos -->
+    <title>ENEE-UTCD - Levantamiento de Usuarios Ilegales</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Librerías base -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
 <div id="login-container" class="container">
-    <header>
+    <div class="card">
         <div style="background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: center;">
-              <img src="https://raw.githubusercontent.com/proyectosjdop-alfa/app_poda/refs/heads/main/imagenes/UTCD%20Vertical.png" alt="Logo ENEE" style="max-width: 250px; height: auto;">
+            <img src="https://raw.githubusercontent.com/proyectosjdop-alfa/app_poda/refs/heads/main/imagenes/UTCD%20Vertical.png" alt="Logo ENEE" style="max-width: 250px; height: auto;">
         </div>
-        <h1>Acceso al Sistema</h1>
-    </header>
-    <div class="card" style="padding: 20px;">
-        <label>Seleccione su Sector:</label>
-        <select id="user">
-            <option value="">Seleccione...</option>
-            <option value="brus laguna">BRUS LAGUNA</option>
-            <option value="choluteca">CHOLUTECA</option>
-            <option value="comayagua">COMAYAGUA</option>
-            <option value="danli">DANLI</option>
-            <option value="el progreso">EL PROGRESO</option>
-            <option value="juticalpa">JUTICALPA</option>
-            <option value="la ceiba">LA CEIBA</option>
-	    <option value="san pedro sula">SAN PEDRO SULA</option>
-            <option value="santa barbara">SANTA BARBARA</option>
-            <option value="santa rosa">SANTA ROSA</option>
-            <option value="santa cruz">SANTA CRUZ</option>
-            <option value="tegucigalpa">TEGUCIGALPA</option>
-            <option value="tocoa">TOCOA</option>
-        </select>
-
-        <label>Contraseña:</label>
-        <input type="password" id="pass" placeholder="Ingrese su contraseña">
-	
-	<button type="button" class="btn-enviar" onclick="validarLogin()">INGRESAR</button>
-        <p id="login-error" style="color: #e74c3c; font-size: 0.8rem; margin-top: 10px; display: none;">Credenciales incorrectas</p>
+        <h1>Levantamiento de Usuarios Ilegales</h1>
+        <p style="color: #c7d1d8; font-size: 0.9rem; margin-bottom: 20px;">Control de Pérdidas - UTCD</p>
+        
+        <div class="form-group">
+            <label><i class="fas fa-layer-group"></i> Seleccione su Sector</label>
+            <select id="login-sector">
+                <option value="">-- Seleccionar Sector --</option>
+                <option value="CHOLUTECA">CHOLUTECA</option>
+                <option value="TEGUCIGALPA">TEGUCIGALPA</option>
+                <option value="DANLI">DANLI</option>
+                <option value="EL PROGRESO">EL PROGRESO</option>
+                <option value="SANTA CRUZ DE YOJOA">SANTA CRUZ DE YOJOA</option>
+                <option value="LA CEIBA">LA CEIBA</option>
+                <option value="TOCOA">TOCOA</option>
+                <option value="COMAYAGUA">COMAYAGUA</option>
+                <option value="JUTICALPA">JUTICALPA</option>
+                <option value="SAN PEDRO SULA">SAN PEDRO SULA</option>
+                <option value="SANTA ROSA DE COPAN">SANTA ROSA DE COPAN</option>
+                <option value="GUANAJA">GUANAJA</option>
+                <option value="BRUS LAGUNA">BRUS LAGUNA</option>
+                <option value="SANTA BARBARA">SANTA BARBARA</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> Contraseña</label>
+            <input type="password" id="login-pass" placeholder="Ingrese contraseña">
+        </div>
+        <button class="btn-enviar" onclick="validarAcceso()">INGRESAR AL SISTEMA</button>
     </div>
 </div>
 
-<div id="form-poda-container" class="container" style="display: none;">
+<div id="app-container" class="container" style="display: none;">
     <header>
         <div style="background-color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: center;">
-              <img src="https://raw.githubusercontent.com/proyectosjdop-alfa/app_poda/refs/heads/main/imagenes/UTCD%20Vertical.png" alt="Logo ENEE" style="max-width: 180px; height: auto;">
+            <img src="https://raw.githubusercontent.com/proyectosjdop-alfa/app_poda/refs/heads/main/imagenes/UTCD%20Vertical.png" alt="Logo ENEE" style="max-width: 200px; height: auto;">
         </div>
-        <h1>PODA COMUNITARIA</h1>
-        <p id="user-display" style="color: var(--accent); font-weight: bold; font-size: 0.8rem;"></p>
+        <h1 id="txt-sector-activo">SECTOR: ---</h1>
     </header>
 
-    <form id="form-poda">
-        <label>Número de Reporte ENERGIS:</label>
-        <input type="text" id="poda-energis" placeholder="Ej: 2026-001" required>
-        
-        <label>Circuito:</label>
-		<select id="poda-circuito" onchange="cargarCapaCircuitos()">
-    		<option value="">Seleccione un circuito...</option>
-		</select>
-
-        <label>Zona de Trabajo:</label>
-        <input type="text" id="poda-zona">
-
-        <label>Fecha:</label>
-        <input type="date" id="poda-fecha">
-
-        <div class="grid-2">
-            <div><label>Hora Inicio:</label><input type="time" id="h-ini"></div>
-            <div><label>Hora Final:</label><input type="time" id="h-fin"></div>
-        </div>
-
-        <label>Trabajo ejecutado:</label>
-        <div class="grid-3">
-            <input type="number" id="m-brecha" placeholder="Brecha">
-            <input type="number" id="m-poda" placeholder="Poda">
-            <input type="number" id="m-postes" placeholder="Postes">
-        </div>
-
-        <label>Personal y Pagos:</label>
-        <input type="number" id="poda-personas" placeholder="Personas Contratadas">
-
-        <div class="grid-2">
-    		<input type="text" id="pago-mo" placeholder="Mano de Obra" oninput="formatearMoneda(this)">
-    		<input type="text" id="pago-trans" placeholder="Transporte" oninput="formatearMoneda(this)">
-		</div>
-
-        <label>Responsables:</label>
-        <input type="text" id="resp-super" placeholder="Responsable Supervisión">
-        <input type="text" id="resp-activ" placeholder="Responsable Actividades Contratista">
-
-        <label>Fotos Grupo e Identidades:</label>
-        <div class="grid-2">
-            <div class="foto-input-group">
-                <span>📸 GRUPO (TOMAR HORIZONTAL)</span>
-                <input type="file" id="f-grupo" onchange="previsualizar(this, 'p-f-grupo')">
-                <div id="p-f-grupo" class="preview-box"></div>
-            </div>
-	    <div class="foto-input-group">
-                <span>📸 VEHÍCULO (TOMAR VERTICAL)</span>
-                <input type="file" id="f-vehiculo" onchange="previsualizar(this, 'p-f-vehiculo')">
-                <div id="p-f-vehiculo" class="preview-box"></div>
-            </div>
-        </div>
-
-        <label>Fotos Líder de Cuadrilla:</label>
-        <div class="grid-2">
-		<div class="foto-input-group">
-                <span>DNI LÍDER FRENTE</span>
-                <input type="file" id="f-lider-f" onchange="previsualizar(this, 'p-f-liderf')">
-                <div id="p-f-liderf" class="preview-box"></div>
-            </div>
-            <div class="foto-input-group">
-                <span>DNI LÍDER REVÉS</span>
-                <input type="file" id="f-lider-r" onchange="previsualizar(this, 'p-f-liderr')">
-                <div id="p-f-liderr" class="preview-box"></div>
-            </div>
-        </div>
-
-        <label>Identidades Personal (Grupo 1):</label>
-        <div class="grid-2">
-		<div class="foto-input-group">
-                <span>DNI FRENTE (1)</span>
-                <input type="file" id="f-id-f" onchange="previsualizar(this, 'p-f-idf')">
-                <div id="p-f-idf" class="preview-box"></div>
-            </div>
-            <div class="foto-input-group">
-                <span>DNI REVÉS (1)</span>
-                <input type="file" id="f-id-r" onchange="previsualizar(this, 'p-f-idr')">
-                <div id="p-f-idr" class="preview-box"></div>
-            </div>
-        </div>
-
-        <label>Identidades Personal (Grupo 2 - Opcional):</label>
-        <div class="grid-2">
-		<div class="foto-input-group">
-                <span>DNI FRENTE (2)</span>
-                <input type="file" id="f-id-f2" onchange="previsualizar(this, 'p-f-idf2')">
-                <div id="p-f-idf2" class="preview-box"></div>
-            </div>
-            <div class="foto-input-group">
-                <span>DNI REVÉS (2)</span>
-                <input type="file" id="f-id-r2" onchange="previsualizar(this, 'p-f-idr2')">
-                <div id="p-f-idr2" class="preview-box"></div>
-            </div>
-        </div>
-
-        <label>Fotos Antes:</label>
-        <div class="grid-3">
-            <div class="foto-input-group"><input type="file" id="f-ini-1" onchange="previsualizar(this, 'p-ini-1')"><div id="p-ini-1" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-ini-2" onchange="previsualizar(this, 'p-ini-2')"><div id="p-ini-2" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-ini-3" onchange="previsualizar(this, 'p-ini-3')"><div id="p-ini-3" class="preview-box"></div></div>
-        </div>
-
-        <label>Fotos Durante:</label>
-        <div class="grid-3">
-            <div class="foto-input-group"><input type="file" id="f-eje-1" onchange="previsualizar(this, 'p-eje-1')"><div id="p-eje-1" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-eje-2" onchange="previsualizar(this, 'p-eje-2')"><div id="p-eje-2" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-eje-3" onchange="previsualizar(this, 'p-eje-3')"><div id="p-eje-3" class="preview-box"></div></div>
-        </div>
-
-        <label>Fotos Después:</label>
-        <div class="grid-3">
-            <div class="foto-input-group"><input type="file" id="f-fin-1" onchange="previsualizar(this, 'p-fin-1')"><div id="p-fin-1" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-fin-2" onchange="previsualizar(this, 'p-fin-2')"><div id="p-fin-2" class="preview-box"></div></div>
-            <div class="foto-input-group"><input type="file" id="f-fin-3" onchange="previsualizar(this, 'p-fin-3')"><div id="p-fin-3" class="preview-box"></div></div>
-        </div>
-
-        <label>GPS:</label>
-        <div id="map-poda" style="height: 180px; border-radius: 8px;"></div>
-
-        <div style="background: #1b2a36; padding: 12px; border-radius: 8px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+    <form id="form-levantamiento" onsubmit="event.preventDefault();">
+        <div class="card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-edit"></i> Datos Generales</h3>
             
-            <div class="grid-3" style="align-items: center;">
-                <input type="number" id="manual-lat" step="any" placeholder="Latitud Inicial">
-                <input type="number" id="manual-lng" step="any" placeholder="Longitud Inicial">
-                <div style="display: flex; gap: 5px;">
-                    <button type="button" class="btn-ubicar" style="flex: 1;" onclick="ingresarManual('ini')">UBICAR</button>
-                    <button type="button" class="btn-gps" style="flex: 1; background-color: #2ecc71;" onclick="marcarGPS('ini')">GPS INICIAL</button>
-                </div>
+            <div class="form-group">
+                <label>a) Fecha del Levantamiento</label>
+                <input type="date" id="campo-fecha" required>
             </div>
 
-            <div class="grid-3" style="align-items: center;">
-                <input type="number" id="manual-lat-fin" step="any" placeholder="Latitud Final">
-                <input type="number" id="manual-lng-fin" step="any" placeholder="Longitud Final">
-                <div style="display: flex; gap: 5px;">
-                    <button type="button" class="btn-ubicar" style="flex: 1;" onclick="ingresarManual('fin')">UBICAR</button>
-                    <button type="button" class="btn-gps-fin" style="flex: 1; background-color: #e74c3c;" onclick="marcarGPS('fin')">GPS FINAL</button>
-                </div>
+            <div class="form-group">
+                <label>b) Encargado del Levantamiento</label>
+                <input type="text" id="campo-encargado" placeholder="Nombre del inspector" required>
             </div>
 
+            <div class="form-group">
+                <label>c) Nombre Completo del Usuario</label>
+                <input type="text" id="campo-usuario" placeholder="Nombre del cliente o abonado" required>
+            </div>
+            
+            <div class="form-group">
+                <label>g) Circuito</label>
+                <select id="campo-circuito" required>
+                    <option value="">-- Seleccione un Circuito --</option>
+                </select>
+            </div>
         </div>
 
-        <p class="coords-text" id="coords-display" style="margin-top: 8px; font-weight: bold;">Inicio: -- | Fin: --</p>
+        <div class="card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-map-marker-alt"></i> Ubicación y Coordenadas</h3>
+            
+            <button type="button" class="btn-enviar" style="background:#2ecc71; color:white; margin-bottom:15px;" onclick="capturarUbicacion()">
+                <i class="fas fa-crosshairs"></i> CAPTURAR COORDENADAS EN CAMPO
+            </button>
 
-        <button type="button" class="btn-enviar" onclick="generarPDFPoda()">GENERAR INFORME PODA</button>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Latitud</label>
+                    <input type="number" id="campo-lat" step="any" readonly placeholder="Calculando...">
+                </div>
+                <div class="form-group">
+                    <label>Longitud</label>
+                    <input type="number" id="campo-lng" step="any" readonly placeholder="Calculando...">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+                <label>e) Coordenada UTM (Zona 16P / 17P)</label>
+                <input type="text" id="campo-utm" readonly placeholder="Conversión automática en campo" style="background: #1b2a36; color: #f4c430; font-weight: bold;">
+            </div>
+
+            <h4 style="color: var(--accent); margin-top: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px;">f) Dirección del Lugar</h4>
+            
+            <div class="form-group">
+                <label>Municipio</label>
+                <input type="text" id="lugar-municipio" placeholder="Ej. Distrito Central" required>
+            </div>
+            <div class="form-group">
+                <label>Colonia / Barrio / Aldea</label>
+                <input type="text" id="lugar-colonia" placeholder="Ej. Col. Miraflores" required>
+            </div>
+            <div class="form-group">
+                <label>Referencia de la Vivienda</label>
+                <textarea id="lugar-referencia" rows="2" placeholder="Ej. Frente a pulpería El Provenir, casa color verde" required></textarea>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-camera"></i> Evidencias Fotográficas</h3>
+            <p style="color:#c7d1d8; font-size:0.8rem; margin-bottom:15px;">Las fotos de fachada, medidor y extras incluirán marca de agua automatizada.</p>
+
+            <div class="foto-input-group">
+                <span>a) FOTO DNI FRONTAL (Tamaño Tarjeta)</span>
+                <input type="file" accept="image/*" id="foto-dni-frontal" onchange="procesarImagenSimple(this, 'prev-dni-frontal')" required>
+                <div class="preview-box" id="prev-dni-frontal">Sin archivo</div>
+            </div>
+
+            <div class="foto-input-group">
+                <span>b) FOTO DNI REVERSO (Tamaño Tarjeta)</span>
+                <input type="file" accept="image/*" id="foto-dni-revers" onchange="procesarImagenSimple(this, 'prev-dni-revers')" required>
+                <div class="preview-box" id="prev-dni-revers">Sin archivo</div>
+            </div>
+
+            <div class="foto-input-group">
+                <span>c) FOTO FACHADA DE VIVIENDA (Horizontal)</span>
+                <input type="file" accept="image/*" id="foto-fachada" onchange="procesarImagenConMarcaAgua(this, 'prev-fachada', 'HORIZONTAL')" required>
+                <div class="preview-box" id="prev-fachada">Sin archivo</div>
+            </div>
+
+            <div class="foto-input-group">
+                <span>d) FOTO BASE DEL MEDIDOR (Vertical Ajustada)</span>
+                <input type="file" accept="image/*" id="foto-medidor" onchange="procesarImagenConMarcaAgua(this, 'prev-medidor', 'VERTICAL')" required>
+                <div class="preview-box" id="prev-medidor">Sin archivo</div>
+            </div>
+
+            <div class="foto-input-group" style="border-color: #3498db;">
+                <span>e) OTRAS FOTOS ADICIONALES (Opcional)</span>
+                <input type="file" accept="image/*" id="foto-extras" multiple onchange="procesarMultiplesExtras(this)">
+                <div id="contenedor-prev-extras" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:5px;"></div>
+            </div>
+        </div>
+
+        <button type="button" class="btn-enviar" style="font-size:1.2rem; padding:18px;" onclick="generarReportePDF()">
+            <i class="fas fa-file-pdf"></i> GENERAR E IMPRIMIR PDF
+        </button>
     </form>
-</div>	
-<!-- Script del proyecto -->
+</div>
+
 <script src="app.js"></script>
 </body>
-</html>	
+</html>
