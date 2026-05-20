@@ -45,7 +45,7 @@ async function validarAcceso() {
         return;
     }
     
-    if (pass === "enee2026") {
+    if (pass === "Ilegal2026*") {
         sectorActivo = sector;
         document.getElementById("txt-sector-activo").innerText = `SECTOR: ${sectorActivo.toUpperCase()}`;
         document.getElementById("campo-circuito").innerHTML = '<option value="">Descargando circuitos oficiales...</option>';
@@ -429,7 +429,7 @@ function generarReportePDF() {
     doc.setFont("Helvetica", "Bold"); 
     doc.setFontSize(10); 
     doc.setTextColor(0, 0, 0);
-    doc.text("Aquí va toda la información:", margen + 4, margen + 25);
+    doc.text("INFORMACIÓN DEL LEVANTAMIENTO:", xCentrado, yActual);
 
     // Arreglo de campos a imprimir
     const datosMapeados = [
@@ -489,7 +489,7 @@ function generarReportePDF() {
     });
 
     // Posición para las fotos de los DNI de forma estrictamente VERTICAL abajo del recuadro
-    yActual += 6; 
+    yActual += 10; 
     doc.setFont("Helvetica", "Bold"); 
     doc.setFontSize(9);
     
@@ -498,16 +498,16 @@ function generarReportePDF() {
     const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2); // Centrado exacto
 
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        doc.text("FOTO FRONTAL DNI DEL USUARIO", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
         doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); // Marco de foto
-        yActual += altoDNI + 6;
+        yActual += altoDNI + 10;
     }
     
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        doc.text("FOTO REVERSO DNI DEL USUARIO", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
