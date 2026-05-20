@@ -143,10 +143,14 @@
             <div id="prev-medidor" class="preview-box-grande" style="max-width: 250px; margin: 5px auto 0 auto;"></div>
         </div>
 
-        <div class="foto-input-group" style="margin-top:15px;">
-            <span>EVIDENCIAS ADICIONALES (MÚLTIPLES FOTOS)</span>
-            <input type="file" accept="image/*" multiple onchange="procesarMultiplesExtras(this)">
-            <div id="contenedor-prev-extras" class="grid-3" style="margin-top:8px;"></div>
+        <div class=\"card\" style=\"margin-top: 15px;\">
+            <label class=\"foto-input-group\">
+                <i class=\"fa-solid fa-camera\"></i>
+                <span>TOMAR FOTO EXTRA (SIN LÍMITE)</span>
+                <input type=\"file\" accept=\"image/*\" capture=\"environment\" onchange=\"procesarFotoExtraSiguiente(this)\" style=\"display: none;\">
+            </label>
+    
+            <div id=\"contenedor-prev-extras\" style=\"display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px;\"></div>
         </div>
     </div>
 
