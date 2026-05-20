@@ -369,7 +369,7 @@ function procesarMultiplesExtras(input) {
         });
     }
 }
-// GENERACIÓN DE PDF SIGUIENDO EL MODELO DE EXCEL CON CUADRO DE INFORMACIÓN LIMPIO (SIN LÍNEAS INTERNAS)
+// GENERACIÓN DE PDF CORREGIDA, CENTRADA Y SIN ERRORES DE SINTAXIS
 function generarReportePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
@@ -385,14 +385,13 @@ function generarReportePDF() {
         doc.setLineWidth(0.6);
         doc.rect(margen, margen, maxAncho - (margen * 2), maxAlto - (margen * 2));
         
-        // 2. MARCO DEL ENCABEZADO SUPERIOR (Celdas unificadas de arriba)
+        // 2. MARCO DEL ENCABEZADO SUPERIOR
         doc.setLineWidth(0.5);
         doc.setDrawColor(22, 35, 47);
         doc.rect(margen + 2, margen + 2, maxAncho - (margen * 2) - 4, 18); // Caja contenedora del header
 
-        // Línea divisoria interna para el logo
+        // Líneas divisorias internas del encabezado
         doc.line(margen + 47, margen + 2, margen + 47, margen + 20);
-        // Línea divisoria interna para el cuadro de control (Código/Versión)
         doc.line(165, margen + 2, 165, margen + 20);
 
         // Imagen del Logo
@@ -400,22 +399,22 @@ function generarReportePDF() {
         doc.addImage("https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical.png", "PNG", margen + 4, margen + 4, 39, 14);
 
         // Título Central
-        doc.setFont("Helvetica", "Bold"); 
+        doc.setFont("helvetica", "bold"); 
         doc.setFontSize(11); 
         doc.setTextColor(22, 35, 47);
         doc.text("LEVANTAMIENTO DE ILEGALES", 106, margen + 8, { align: "center" });
         doc.setFontSize(10); 
         doc.text(`SECTOR ${sectorActivo.toUpperCase()}`, 106, margen + 14, { align: "center" });
 
-        // Cuadrícula Informativa de Control Derecha (Líneas horizontales internas)
+        // Cuadrícula Informativa de Control Derecha (Fijos y Vacíos)
         doc.line(165, margen + 8, maxAncho - margen - 2, margen + 8);
         doc.line(165, margen + 14, maxAncho - margen - 2, margen + 14);
 
         doc.setFontSize(8); 
-        doc.setFont("Helvetica", "Normal");
-        doc.text("Código:", 167, margen + 6);   // Vacío tal como se solicitó
+        doc.setFont("helvetica", "normal");
+        doc.text("Código:", 167, margen + 6);   
         doc.text("Versión: 1", 167, margen + 12);
-        doc.text("Fecha:", 167, margen + 18);    // Vacío tal como se solicitó
+        doc.text("Fecha:", 167, margen + 18);    
 
         // Footer de la página
         doc.setFontSize(8); 
@@ -426,10 +425,11 @@ function generarReportePDF() {
     // ================= PÁGINA 1: DATOS (RECUADRO LIMPIO) Y DNIs =================
     aplicarMarcoYEncabezadoExcel(1);
     
-    doc.setFont("Helvetica", "Bold"); 
+    doc.setFont("helvetica", "bold"); 
     doc.setFontSize(10); 
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORMACIÓN DEL LEVANTAMIENTO:", maxAncho / 2, margen + 25, { align: "center" }););
+    // Texto centrado perfectamente usando el ancho dinámico de la página
+    doc.text("Aquí va toda la información:", maxAncho / 2, margen + 25, { align: "center" });
 
     // Arreglo de campos a imprimir
     const datosMapeados = [
@@ -446,10 +446,10 @@ function generarReportePDF() {
     ];
 
     let inicioYTabla = margen + 28;
-    let anchoTabla = maxAncho - (margen * 2) - 8; // 182 mm
+    let anchoTabla = maxAncho - (margen * 2) - 8; 
     let altoFilaFija = 6.5;
     
-    // 1. PRIMER PASO: Calcular la altura total que va a requerir el cuadro contenedor
+    // 1. Calcular la altura total que requiere el cuadro contenedor único
     let altoTotalCuadro = 0;
     datosMapeados.forEach(([campo, valor]) => {
         if (campo.includes("REFERENCIA")) {
@@ -460,25 +460,25 @@ function generarReportePDF() {
         }
     });
 
-    // 2. SEGUNDO PASO: Dibujar el RECUADRO ÚNICO EXTERIOR (sin líneas internas divisorias)
+    // 2. Dibujar el RECUADRO ÚNICO EXTERIOR sin líneas internas
     doc.setDrawColor(22, 35, 47);
     doc.setLineWidth(0.4);
     doc.rect(margen + 4, inicioYTabla, anchoTabla, altoTotalCuadro);
 
-    // 3. TERCER PASO: Imprimir el texto de forma corrida dentro del recuadro vacío
+    // 3. Imprimir el texto limpio en su interior
     let yActual = inicioYTabla;
     datosMapeados.forEach(([campo, valor]) => {
         let esReferencia = campo.includes("REFERENCIA");
         let lineasDeTexto = doc.splitTextToSize(valor, 115);
         let altoFilaActual = esReferencia ? (lineasDeTexto.length * 4.5) + 3 : altoFilaFija;
 
-        // Imprimir Etiqueta (Negrita)
-        doc.setFont("Helvetica", "Bold");
+        // Imprimir Etiqueta
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(8.5);
         doc.text(campo, margen + 7, yActual + 4.5);
 
-        // Imprimir Valor (Normal) alineado a la misma altura
-        doc.setFont("Helvetica", "Normal");
+        // Imprimir Valor alineado
+        doc.setFont("helvetica", "normal");
         if (esReferencia) {
             doc.text(lineasDeTexto, margen + 65, yActual + 4.5);
         } else {
@@ -488,30 +488,30 @@ function generarReportePDF() {
         yActual += altoFilaActual;
     });
 
-    // Posición para las fotos de los DNI de forma estrictamente VERTICAL abajo del recuadro
-    yActual += 10; 
-    doc.setFont("Helvetica", "Bold"); 
+    // Posición para las fotos de los DNI de forma VERTICAL abajo
+    yActual += 6; 
+    doc.setFont("helvetica", "bold"); 
     doc.setFontSize(9);
     
     const anchoDNI = 85.6;
     const altoDNI = 54;
-    const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2); // Centrado exacto
+    const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2);
 
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO", xCentradoDNI, yActual);
+        doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
-        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); // Marco de foto
-        yActual += altoDNI + 10;
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); 
+        yActual += altoDNI + 6;
     }
     
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO", xCentradoDNI, yActual);
+        doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
-        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); // Marco de foto
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); 
     }
 
     // ================= PÁGINA 2: FACHADA Y MEDIDOR CON MARCOS =================
@@ -519,9 +519,9 @@ function generarReportePDF() {
     aplicarMarcoYEncabezadoExcel(2);
 
     let yPag2 = margen + 25;
-    doc.setFont("Helvetica", "Bold"); doc.setFontSize(9);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9);
     
-    // Foto Fachada: 160 mm × 100 mm con su respectivo marco
+    // Foto Fachada: 160 mm × 100 mm con su marco
     doc.text("FOTO FACHADA: 160 mm × 100 mm", margen + 5, yPag2);
     if(datosFotos.fachada) {
         let xFachada = (maxAncho / 2) - 80;
@@ -530,7 +530,7 @@ function generarReportePDF() {
         doc.rect(xFachada, yPag2 + 3, 160, 100);
     }
 
-    // Foto Medidor: 70 mm × 100 mm con su respectivo marco
+    // Foto Medidor: 70 mm × 100 mm con su marco
     yPag2 += 114;
     doc.text("FOTO BASE DEL MEDIDOR: 70 mm × 100 mm", margen + 5, yPag2);
     if(datosFotos.medidor) {
@@ -553,7 +553,7 @@ function generarReportePDF() {
                 yFotosExtras = margen + 25;
             }
 
-            doc.setFont("Helvetica", "Bold"); doc.setFontSize(9);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(9);
             doc.text(`OTRAS FOTOS ${indice + 1}: 160 mm × 100 mm`, margen + 5, yFotosExtras);
             
             let xExtra = (maxAncho / 2) - 80;
@@ -571,6 +571,6 @@ function generarReportePDF() {
         });
     }
 
-    // Abrir visor de impresión nativo de la orden armada
+    // Lanzar el visor de impresión integrado
     window.open(doc.output('bloburl'), '_blank');
 }
