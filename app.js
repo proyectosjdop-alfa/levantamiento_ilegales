@@ -429,7 +429,7 @@ function generarReportePDF() {
     doc.setFont("Helvetica", "Bold"); 
     doc.setFontSize(10); 
     doc.setTextColor(0, 0, 0);
-    doc.text("INFORMACIÓN DEL LEVANTAMIENTO:", xCentrado, yActual);
+    doc.text("INFORMACIÓN DEL LEVANTAMIENTO:", maxAncho / 2, margen + 25, { align: "center" }););
 
     // Arreglo de campos a imprimir
     const datosMapeados = [
