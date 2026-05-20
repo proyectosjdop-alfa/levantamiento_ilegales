@@ -258,7 +258,7 @@ function procesarMultiplesExtras(input) {
     }
 }
 
-// GENERACIÓN DE PDF SIGUIENDO EL MODELO DE EXCEL CON MARCOS Y DNIs VERTICALES
+// GENERACIÓN DE PDF SIGUIENDO EL MODELO DE EXCEL CON CUADRO DE INFORMACIÓN LIMPIO (SIN LÍNEAS INTERNAS)
 function generarReportePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
@@ -302,9 +302,9 @@ function generarReportePDF() {
 
         doc.setFontSize(8); 
         doc.setFont("Helvetica", "Normal");
-        doc.text("Código:", 167, margen + 6);   // Vacío
+        doc.text("Código:", 167, margen + 6);   // Vacío tal como se solicitó
         doc.text("Versión: 1", 167, margen + 12);
-        doc.text("Fecha:", 167, margen + 18);    // Vacío
+        doc.text("Fecha:", 167, margen + 18);    // Vacío tal como se solicitó
 
         // Footer de la página
         doc.setFontSize(8); 
@@ -312,7 +312,7 @@ function generarReportePDF() {
         doc.text(`Página ${numPagina}`, maxAncho - margen - 15, maxAlto - margen - 4);
     }
 
-    // ================= PÁGINA 1: DATOS Y DNIs VERTICALES =================
+    // ================= PÁGINA 1: DATOS (RECUADRO LIMPIO) Y DNIs =================
     aplicarMarcoYEncabezadoExcel(1);
     
     doc.setFont("Helvetica", "Bold"); 
@@ -337,28 +337,36 @@ function generarReportePDF() {
     let inicioYTabla = margen + 28;
     let anchoTabla = maxAncho - (margen * 2) - 8; // 182 mm
     let altoFilaFija = 6.5;
-    let yActual = inicioYTabla;
+    
+    // 1. PRIMER PASO: Calcular la altura total que va a requerir el cuadro contenedor
+    let altoTotalCuadro = 0;
+    datosMapeados.forEach(([campo, valor]) => {
+        if (campo.includes("REFERENCIA")) {
+            let lineasDeTexto = doc.splitTextToSize(valor, 115);
+            altoTotalCuadro += (lineasDeTexto.length * 4.5) + 3;
+        } else {
+            altoTotalCuadro += altoFilaFija;
+        }
+    });
 
-    // Dibujar el marco exterior contenedor para toda la información general
+    // 2. SEGUNDO PASO: Dibujar el RECUADRO ÚNICO EXTERIOR (sin líneas internas divisorias)
     doc.setDrawColor(22, 35, 47);
     doc.setLineWidth(0.4);
+    doc.rect(margen + 4, inicioYTabla, anchoTabla, altoTotalCuadro);
 
-    // Procesar filas calculando la altura dinámica por si la referencia es larga
+    // 3. TERCER PASO: Imprimir el texto de forma corrida dentro del recuadro vacío
+    let yActual = inicioYTabla;
     datosMapeados.forEach(([campo, valor]) => {
         let esReferencia = campo.includes("REFERENCIA");
         let lineasDeTexto = doc.splitTextToSize(valor, 115);
         let altoFilaActual = esReferencia ? (lineasDeTexto.length * 4.5) + 3 : altoFilaFija;
 
-        // Dibujar celda (marco de la fila)
-        doc.rect(margen + 4, yActual, anchoTabla, altoFilaActual);
-        // Línea vertical que separa la columna "Etiqueta" del "Valor"
-        doc.line(margen + 62, yActual, margen + 62, yActual + altoFilaActual);
-
-        // Imprimir Texto
+        // Imprimir Etiqueta (Negrita)
         doc.setFont("Helvetica", "Bold");
         doc.setFontSize(8.5);
         doc.text(campo, margen + 7, yActual + 4.5);
 
+        // Imprimir Valor (Normal) alineado a la misma altura
         doc.setFont("Helvetica", "Normal");
         if (esReferencia) {
             doc.text(lineasDeTexto, margen + 65, yActual + 4.5);
@@ -369,33 +377,30 @@ function generarReportePDF() {
         yActual += altoFilaActual;
     });
 
-    // Posición para las fotos de los DNI de forma estrictamente VERTICAL
+    // Posición para las fotos de los DNI de forma estrictamente VERTICAL abajo del recuadro
     yActual += 6; 
     doc.setFont("Helvetica", "Bold"); 
     doc.setFontSize(9);
     
-    // Ancho y alto estándar de una tarjeta de identificación (85.6 mm x 54 mm)
     const anchoDNI = 85.6;
     const altoDNI = 54;
-    const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2); // Centrado exacto en la página
+    const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2); // Centrado exacto
 
     if(datosFotos.dniFrontal) {
         doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
         yActual += 2;
-        // Imagen + Marco perimetral de la foto
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
-        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI);
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); // Marco de foto
         yActual += altoDNI + 6;
     }
     
     if(datosFotos.dniRevers) {
         doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
         yActual += 2;
-        // Imagen + Marco perimetral de la foto
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
-        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI);
+        doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); // Marco de foto
     }
 
     // ================= PÁGINA 2: FACHADA Y MEDIDOR CON MARCOS =================
@@ -411,7 +416,7 @@ function generarReportePDF() {
         let xFachada = (maxAncho / 2) - 80;
         doc.addImage(datosFotos.fachada, "JPEG", xFachada, yPag2 + 3, 160, 100);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
-        doc.rect(xFachada, yPag2 + 3, 160, 100); // Marco de la foto fachada
+        doc.rect(xFachada, yPag2 + 3, 160, 100);
     }
 
     // Foto Medidor: 70 mm × 100 mm con su respectivo marco
@@ -421,7 +426,7 @@ function generarReportePDF() {
         let xMedidor = (maxAncho / 2) - 35;
         doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 70, 100);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
-        doc.rect(xMedidor, yPag2 + 3, 70, 100); // Marco de la foto medidor
+        doc.rect(xMedidor, yPag2 + 3, 70, 100);
     }
 
     // ================= PÁGINAS 3+: OTRAS FOTOS EXTRAS CON MARCOS =================
@@ -443,7 +448,7 @@ function generarReportePDF() {
             let xExtra = (maxAncho / 2) - 80;
             doc.addImage(imgExtra, "JPEG", xExtra, yFotosExtras + 3, 160, 100);
             doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
-            doc.rect(xExtra, yFotosExtras + 3, 160, 100); // Marco de la foto adicional
+            doc.rect(xExtra, yFotosExtras + 3, 160, 100);
             
             yFotosExtras += 114;
             conteoFotosPorPagina++;
