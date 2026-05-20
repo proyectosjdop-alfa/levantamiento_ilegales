@@ -205,7 +205,7 @@ function procesarImagenSimple(input, idPreview) {
     }
 }
 
-// Procesa Fachada y Medidor inyectando el logo y los textos verticales abajo a la izquierda
+// Procesa Fachada y Medidor aplicando el recuadro blanco al logo y letras blancas limpias
 function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
     if (input.files && input.files[0]) {
         const lector = new FileReader();
@@ -216,18 +216,15 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d");
                 
-                // Fijar resolución del lienzo de la foto
                 canvas.width = orientacion === "HORIZONTAL" ? 1280 : 720;
                 canvas.height = orientacion === "HORIZONTAL" ? 720 : 1280;
                 ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
                 
-                // Cargar el logo para estamparlo en la esquina inferior izquierda
                 const logoMarca = new Image();
                 logoMarca.crossOrigin = "anonymous";
                 logoMarca.src = "https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical%20.png";
                 
                 logoMarca.onload = function() {
-                    // Obtener datos en tiempo real
                     const ahora = new Date();
                     const fechaTxt = `Fecha: ${ahora.toLocaleDateString('es-HN')}`;
                     const horaTxt = `Hora: ${ahora.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
@@ -236,33 +233,39 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
                     const coordTxt = `Coordenadas: ${lat}, ${lng}`;
                     const sectorTxt = `Sector: ${sectorActivo.toUpperCase()}`;
 
-                    // Dimensiones calculadas para simular 25mm x 35mm en el lienzo
+                    // Dimensiones del logo (Escala aproximada para 25mm x 35mm)
                     const logoAncho = 95;
                     const logoAlto = 133;
                     
-                    // Coordenadas base (Esquina inferior izquierda)
-                    const posX = 20;
-                    const posY = canvas.height - logoAlto - 20;
+                    const posX = 25;
+                    const posY = canvas.height - logoAlto - 25;
 
-                    // Dibujar fondo oscuro semitransparente para legibilidad de los datos
-                    ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-                    ctx.fillRect(posX - 10, posY - 10, 520, logoAlto + 20);
+                    // 1. DIBUJAR FONDO BLANCO SÓLIDO ÚNICAMENTE DETRÁS DEL LOGO
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(posX - 8, posY - 8, logoAncho + 16, logoAlto + 16);
 
-                    // Estampar el logotipo
+                    // Estampar el logotipo sobre su fondo blanco
                     ctx.drawImage(logoMarca, posX, posY, logoAncho, logoAlto);
 
-                    // Configurar el texto vertical a la par del logo
-                    ctx.fillStyle = "#f4c430"; // Amarillo institucional ENEE
-                    ctx.font = "bold 15px Arial";
+                    // 2. CONFIGURAR TEXTO BLANCO SIN FONDO (CON SOMBRA DE CONTRASTE)
+                    ctx.fillStyle = "#ffffff"; 
+                    ctx.font = "bold 16px Arial";
+                    ctx.shadowColor = "black";
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
                     
-                    const textoX = posX + logoAncho + 15;
-                    let textoY = posY + 25;
+                    const textoX = posX + logoAncho + 25;
+                    let textoY = posY + 22;
 
-                    // Imprimir las 4 líneas de datos de forma vertical
+                    // Imprimir datos verticalmente a la par
                     ctx.fillText(fechaTxt, textoX, textoY);
                     ctx.fillText(horaTxt, textoX, textoY + 28);
                     ctx.fillText(coordTxt, textoX, textoY + 56);
                     ctx.fillText(sectorTxt, textoX, textoY + 84);
+
+                    // Resetear sombras para no afectar otros renders futuros del canvas
+                    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
 
                     const finalData = canvas.toDataURL("image/jpeg", 0.85);
                     document.getElementById(idPreview).innerHTML = `<img src="${finalData}">`;
@@ -271,11 +274,10 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
                     if(idPreview === 'prev-medidor') datosFotos.medidor = finalData;
                 };
                 
-                // En caso de que falle la carga del logo por red, estampar los textos solos
                 logoMarca.onerror = function() {
                     ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
-                    ctx.fillStyle = "#f4c430"; ctx.font = "bold 16px Arial";
-                    ctx.fillText(`FALTA LOGO | ${new Date().toLocaleString('es-HN')} | SECTOR: ${sectorActivo}`, 20, canvas.height - 14);
+                    ctx.fillStyle = "#ffffff"; ctx.font = "bold 16px Arial";
+                    ctx.fillText(`ERROR LOGO | ${new Date().toLocaleString('es-HN')} | SECTOR: ${sectorActivo}`, 20, canvas.height - 14);
                     const finalData = canvas.toDataURL("image/jpeg", 0.85);
                     document.getElementById(idPreview).innerHTML = `<img src="${finalData}">`;
                     if(idPreview === 'prev-fachada') datosFotos.fachada = finalData;
@@ -287,7 +289,7 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
     }
 }
 
-// Procesa Múltiples Fotos Extras aplicando exactamente la misma marca de agua
+// Procesa Fotos Extras aplicando exactamente el mismo formato visual
 function procesarMultiplesExtras(input) {
     const contenedor = document.getElementById("contenedor-prev-extras");
     contenedor.innerHTML = ""; 
@@ -319,21 +321,33 @@ function procesarMultiplesExtras(input) {
                         const coordTxt = `Coordenadas: ${lat}, ${lng}`;
                         const sectorTxt = `Sector: ${sectorActivo.toUpperCase()}`;
 
-                        const logoAncho = 95; const logoAlto = 133;
-                        const posX = 20; const posY = canvas.height - logoAlto - 20;
+                        const logoAncho = 95; 
+                        const logoAlto = 133;
+                        const posX = 25; 
+                        const posY = canvas.height - logoAlto - 25;
 
-                        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-                        ctx.fillRect(posX - 10, posY - 10, 520, logoAlto + 20);
+                        // Fondo blanco para el logo
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(posX - 8, posY - 8, logoAncho + 16, logoAlto + 16);
                         ctx.drawImage(logoMarca, posX, posY, logoAncho, logoAlto);
 
-                        ctx.fillStyle = "#f4c430"; ctx.font = "bold 15px Arial";
-                        const textoX = posX + logoAncho + 15;
-                        let textoY = posY + 25;
+                        // Texto blanco sin caja, con sombra de lectura
+                        ctx.fillStyle = "#ffffff"; 
+                        ctx.font = "bold 15px Arial";
+                        ctx.shadowColor = "black";
+                        ctx.shadowBlur = 6;
+                        ctx.shadowOffsetX = 2;
+                        ctx.shadowOffsetY = 2;
+                        
+                        const textoX = posX + logoAncho + 25;
+                        let textoY = posY + 22;
 
                         ctx.fillText(fechaTxt, textoX, textoY);
                         ctx.fillText(horaTxt, textoX, textoY + 28);
                         ctx.fillText(coordTxt, textoX, textoY + 56);
                         ctx.fillText(sectorTxt, textoX, textoY + 84);
+
+                        ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
 
                         const finalData = canvas.toDataURL("image/jpeg", 0.85);
                         datosFotos.extras.push(finalData);
