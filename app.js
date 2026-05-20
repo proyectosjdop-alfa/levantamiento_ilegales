@@ -289,84 +289,102 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
     }
 }
 
-// Procesa Fotos Extras aplicando exactamente el mismo formato visual
-function procesarMultiplesExtras(input) {
-    const contenedor = document.getElementById("contenedor-prev-extras");
-    contenedor.innerHTML = ""; 
-    datosFotos.extras = [];
-    
-    if (input.files) {
-        Array.from(input.files).forEach((archivo) => {
-            const lector = new FileReader();
-            lector.onload = (e) => {
-                const imgElement = new Image(); 
-                imgElement.src = e.target.result;
-                imgElement.onload = function() {
-                    const canvas = document.createElement("canvas"); 
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = 1280; 
-                    canvas.height = 720;
-                    ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+// NUEVO ENFOQUE: Acumulador de fotos extras sin límite con marca de agua institucional
+function procesarFotoExtraSiguiente(input) {
+    if (input.files && input.files[0]) {
+        const archivo = input.files[0];
+        const lector = new FileReader();
+        
+        lector.onload = (e) => {
+            const imgElement = new Image(); 
+            imgElement.src = e.target.result;
+            imgElement.onload = function() {
+                const canvas = document.createElement("canvas"); 
+                const ctx = canvas.getContext("2d");
+                
+                // Forzar resolución estándar horizontal para evidencias
+                canvas.width = 1280; 
+                canvas.height = 720;
+                ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                
+                const logoMarca = new Image();
+                logoMarca.crossOrigin = "anonymous";
+                logoMarca.src = "https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical%20.png";
+                
+                logoMarca.onload = function() {
+                    const ahora = new Date();
+                    const fechaTxt = `Fecha: ${ahora.toLocaleDateString('es-HN')}`;
+                    const horaTxt = `Hora: ${ahora.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+                    const lat = document.getElementById("campo-lat").value || "N/A";
+                    const lng = document.getElementById("campo-lng").value || "N/A";
+                    const coordTxt = `Coordenadas: ${lat}, ${lng}`;
+                    const sectorTxt = `Sector: ${sectorActivo.toUpperCase()}`;
+
+                    const logoAncho = 95; 
+                    const logoAlto = 133;
+                    const posX = 25; 
+                    const posY = canvas.height - logoAlto - 25;
+
+                    // 1. Escudo de fondo blanco para el Logotipo
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(posX - 8, posY - 8, logoAncho + 16, logoAlto + 16);
+                    ctx.drawImage(logoMarca, posX, posY, logoAncho, logoAlto);
+
+                    // 2. Textos técnicos en blanco puro con sombra inalterable
+                    ctx.fillStyle = "#ffffff"; 
+                    ctx.font = "bold 15px Arial";
+                    ctx.shadowColor = "black";
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
                     
-                    const logoMarca = new Image();
-                    logoMarca.crossOrigin = "anonymous";
-                    logoMarca.src = "https://raw.githubusercontent.com/proyectosjdop-alfa/levantamiento_ilegales/refs/heads/main/imagenes/UTCD%20Vertical%20.png";
+                    const textoX = posX + logoAncho + 25;
+                    let textoY = posY + 22;
+
+                    ctx.fillText(fechaTxt, textoX, textoY);
+                    ctx.fillText(horaTxt, textoX, textoY + 28);
+                    ctx.fillText(coordTxt, textoX, textoY + 56);
+                    ctx.fillText(sectorTxt, textoX, textoY + 84);
+
+                    // Limpiar sombras del lienzo
+                    ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+
+                    const finalData = canvas.toDataURL("image/jpeg", 0.85);
                     
-                    logoMarca.onload = function() {
-                        const ahora = new Date();
-                        const fechaTxt = `Fecha: ${ahora.toLocaleDateString('es-HN')}`;
-                        const horaTxt = `Hora: ${ahora.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-                        const lat = document.getElementById("campo-lat").value || "N/A";
-                        const lng = document.getElementById("campo-lng").value || "N/A";
-                        const coordTxt = `Coordenadas: ${lat}, ${lng}`;
-                        const sectorTxt = `Sector: ${sectorActivo.toUpperCase()}`;
-
-                        const logoAncho = 95; 
-                        const logoAlto = 133;
-                        const posX = 25; 
-                        const posY = canvas.height - logoAlto - 25;
-
-                        // Fondo blanco para el logo
-                        ctx.fillStyle = "#ffffff";
-                        ctx.fillRect(posX - 8, posY - 8, logoAncho + 16, logoAlto + 16);
-                        ctx.drawImage(logoMarca, posX, posY, logoAncho, logoAlto);
-
-                        // Texto blanco sin caja, con sombra de lectura
-                        ctx.fillStyle = "#ffffff"; 
-                        ctx.font = "bold 15px Arial";
-                        ctx.shadowColor = "black";
-                        ctx.shadowBlur = 6;
-                        ctx.shadowOffsetX = 2;
-                        ctx.shadowOffsetY = 2;
-                        
-                        const textoX = posX + logoAncho + 25;
-                        let textoY = posY + 22;
-
-                        ctx.fillText(fechaTxt, textoX, textoY);
-                        ctx.fillText(horaTxt, textoX, textoY + 28);
-                        ctx.fillText(coordTxt, textoX, textoY + 56);
-                        ctx.fillText(sectorTxt, textoX, textoY + 84);
-
-                        ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
-
-                        const finalData = canvas.toDataURL("image/jpeg", 0.85);
-                        datosFotos.extras.push(finalData);
-                        
-                        const div = document.createElement("div"); div.className = "preview-box";
-                        div.innerHTML = `<img src="${finalData}">`; 
-                        contenedor.appendChild(div);
-                    };
+                    // Guardar en el arreglo global existente de fotos extras
+                    datosFotos.extras.push(finalData);
                     
-                    logoMarca.onerror = function() {
-                        const finalData = canvas.toDataURL("image/jpeg", 0.8);
-                        datosFotos.extras.push(finalData);
-                        const div = document.createElement("div"); div.className = "preview-box";
-                        div.innerHTML = `<img src="${finalData}">`; contenedor.appendChild(div);
-                    };
+                    // Renderizar la miniatura en la interfaz del usuario inmediatamente
+                    const contenedor = document.getElementById("contenedor-prev-extras");
+                    const div = document.createElement("div"); 
+                    div.className = "preview-box";
+                    div.style.position = "relative";
+                    div.innerHTML = `
+                        <img src="${finalData}" style="width:100%; height:100%; object-fit:cover;">
+                        <span style="position:absolute; top:2px; left:5px; background:rgba(0,0,0,0.7); color:#fff; font-size:10px; padding:2px 5px; border-radius:3px;">
+                            Foto ${datosFotos.extras.length}
+                        </span>
+                    `; 
+                    contenedor.appendChild(div);
+                    
+                    // Resetear el input file para que permita capturar la siguiente inmediatamente
+                    input.value = "";
+                };
+                
+                logoMarca.onerror = function() {
+                    const finalData = canvas.toDataURL("image/jpeg", 0.8);
+                    datosFotos.extras.push(finalData);
+                    
+                    const contenedor = document.getElementById("contenedor-prev-extras");
+                    const div = document.createElement("div"); 
+                    div.className = "preview-box";
+                    div.innerHTML = `<img src="${finalData}" style="width:100%; height:100%; object-fit:cover;">`; 
+                    contenedor.appendChild(div);
+                    input.value = "";
                 };
             };
-            lector.readAsDataURL(archivo);
-        });
+        };
+        lector.readAsDataURL(archivo);
     }
 }
 // GENERACIÓN DE PDF CORREGIDA, CENTRADA Y SIN ERRORES DE SINTAXIS
