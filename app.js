@@ -536,7 +536,7 @@ function generarReportePDF() {
     doc.addPage();
     aplicarMarcoYEncabezadoExcel(2);
 
-    let yPag2 = margen + 35;
+    let yPag2 = margen + 30;
     doc.setFont("helvetica", "bold"); doc.setFontSize(9);
     
     // Foto Fachada: 160 mm × 100 mm con su marco
@@ -572,7 +572,7 @@ function generarReportePDF() {
             }
 
             doc.setFont("helvetica", "bold"); doc.setFontSize(9);
-            doc.text(`OTRAS FOTOS ${indice + 1}: 160 mm × 100 mm`, margen + 5, yFotosExtras);
+            doc.text(`OTRAS FOTOS ${indice + 1}:`, maxAncho / 2, yFotosExtras);
             
             let xExtra = (maxAncho / 2) - 80;
             doc.addImage(imgExtra, "JPEG", xExtra, yFotosExtras + 3, 160, 100);
