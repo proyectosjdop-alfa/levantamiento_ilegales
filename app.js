@@ -549,13 +549,13 @@ function generarReportePDF() {
     }
 
     // Foto Medidor: 70 mm × 100 mm con su marco
-    yPag2 += 130;
+    yPag2 += 120;
     doc.text("FOTO BASE DEL MEDIDOR:", maxAncho / 2, yPag2, { align: "center" });
     if(datosFotos.medidor) {
         let xMedidor = (maxAncho / 2) - 35;
         doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 80, 110);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
-        doc.rect(xMedidor, yPag2 + 3, 70, 100);
+        doc.rect(xMedidor, yPag2 + 3, 80, 110);
     }
 
     // ================= PÁGINAS 3+: OTRAS FOTOS EXTRAS CON MARCOS =================
