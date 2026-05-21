@@ -447,7 +447,7 @@ function generarReportePDF() {
     doc.setFontSize(10); 
     doc.setTextColor(0, 0, 0);
     // Texto centrado perfectamente usando el ancho dinámico de la página
-    doc.text("Aquí va toda la información:", maxAncho / 2, margen + 25, { align: "center" });
+    doc.text("INFORMACIÓN DEL LEVANTAMIENTO:", maxAncho / 2, margen + 30, { align: "center" });
 
     // Arreglo de campos a imprimir
     const datosMapeados = [
