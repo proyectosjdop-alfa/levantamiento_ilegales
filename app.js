@@ -205,7 +205,7 @@ function procesarImagenSimple(input, idPreview) {
     }
 }
 
-// Procesa Fachada y Medidor aplicando el recuadro blanco al logo y letras blancas limpias
+// Procesa Fachada y Medidor aplicando la marca de agua proporcional según la orientación
 function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
     if (input.files && input.files[0]) {
         const lector = new FileReader();
@@ -216,6 +216,7 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
                 const canvas = document.createElement("canvas");
                 const ctx = canvas.getContext("2d");
                 
+                // 1. Establecer dimensiones del lienzo
                 canvas.width = orientacion === "HORIZONTAL" ? 1280 : 720;
                 canvas.height = orientacion === "HORIZONTAL" ? 720 : 1280;
                 ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
@@ -233,40 +234,50 @@ function procesarImagenConMarcaAgua(input, idPreview, orientacion) {
                     const coordTxt = `Coordenadas: ${lat}, ${lng}`;
                     const sectorTxt = `Sector: ${sectorActivo.toUpperCase()}`;
 
-                    // Dimensiones del logo (Escala aproximada para 25mm x 35mm)
-                    const logoAncho = 95;
-                    const logoAlto = 133;
+                    // ============================================================================
+                    // SOLUCIÓN: CÁLCULO PROPORCIONAL (Se adapta si es 1280 o 720 de ancho)
+                    // ============================================================================
+                    const factorEscala = canvas.width / 1280; 
+
+                    // Dimensiones del logo escaladas dinámicamente
+                    const logoAncho = 95 * factorEscala;
+                    const logoAlto = 133 * factorEscala;
                     
-                    const posX = 25;
-                    const posY = canvas.height - logoAlto - 25;
+                    // Márgenes y posiciones calculadas con el factor de escala
+                    const posX = 25 * factorEscala;
+                    const posY = canvas.height - logoAlto - (25 * factorEscala);
 
                     // 1. DIBUJAR FONDO BLANCO SÓLIDO ÚNICAMENTE DETRÁS DEL LOGO
                     ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(posX - 8, posY - 8, logoAncho + 16, logoAlto + 16);
+                    ctx.fillRect(posX - (8 * factorEscala), posY - (8 * factorEscala), logoAncho + (16 * factorEscala), logoAlto + (16 * factorEscala));
 
                     // Estampar el logotipo sobre su fondo blanco
                     ctx.drawImage(logoMarca, posX, posY, logoAncho, logoAlto);
 
-                    // 2. CONFIGURAR TEXTO BLANCO SIN FONDO (CON SOMBRA DE CONTRASTE)
+                    // 2. CONFIGURAR TEXTO BLANCO DINÁMICO CON SOMBRA
                     ctx.fillStyle = "#ffffff"; 
-                    ctx.font = "bold 16px Arial";
-                    ctx.shadowColor = "black";
-                    ctx.shadowBlur = 6;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
+                    // La letra ahora cambia de tamaño: 16px en horizontal, ~9px en vertical para mantener proporción
+                    ctx.font = `bold ${Math.round(16 * factorEscala)}px Arial`;
                     
-                    const textoX = posX + logoAncho + 25;
-                    let textoY = posY + 22;
+                    ctx.shadowColor = "black";
+                    ctx.shadowBlur = 6 * factorEscala;
+                    ctx.shadowOffsetX = 2 * factorEscala;
+                    ctx.shadowOffsetY = 2 * factorEscala;
+                    
+                    const textoX = posX + logoAncho + (25 * factorEscala);
+                    let textoY = posY + (22 * factorEscala);
+                    const interlineado = 28 * factorEscala; // El espacio entre renglones también se encoge
 
-                    // Imprimir datos verticalmente a la par
+                    // Imprimir datos verticalmente a la par usando el nuevo interlineado dinámico
                     ctx.fillText(fechaTxt, textoX, textoY);
-                    ctx.fillText(horaTxt, textoX, textoY + 28);
-                    ctx.fillText(coordTxt, textoX, textoY + 56);
-                    ctx.fillText(sectorTxt, textoX, textoY + 84);
+                    ctx.fillText(horaTxt, textoX, textoY + interlineado);
+                    ctx.fillText(coordTxt, textoX, textoY + (interlineado * 2));
+                    ctx.fillText(sectorTxt, textoX, textoY + (interlineado * 3));
 
                     // Resetear sombras para no afectar otros renders futuros del canvas
                     ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
 
+                    // Guardar y renderizar la imagen final
                     const finalData = canvas.toDataURL("image/jpeg", 0.85);
                     document.getElementById(idPreview).innerHTML = `<img src="${finalData}">`;
                     
