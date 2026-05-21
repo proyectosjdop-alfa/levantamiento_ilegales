@@ -579,7 +579,7 @@ function generarReportePDF() {
             doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
             doc.rect(xExtra, yFotosExtras + 3, 160, 100);
             
-            yFotosExtras += 130;
+            yFotosExtras += 120;
             conteoFotosPorPagina++;
 
             if (conteoFotosPorPagina === 2 && indice < datosFotos.extras.length - 1) {
