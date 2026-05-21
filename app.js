@@ -568,11 +568,11 @@ function generarReportePDF() {
             if (conteoFotosPorPagina === 0) {
                 doc.addPage();
                 aplicarMarcoYEncabezadoExcel(paginaExtraActiva);
-                yFotosExtras = margen + 35;
+                yFotosExtras = margen + 30;
             }
 
             doc.setFont("helvetica", "bold"); doc.setFontSize(9);
-            doc.text(`OTRAS FOTOS ${indice + 1}:`, maxAncho / 2, yFotosExtras);
+            doc.text(`OTRAS FOTOS ${indice + 1}:`, maxAncho / 2, yFotosExtras, { align: "center" });
             
             let xExtra = (maxAncho / 2) - 80;
             doc.addImage(imgExtra, "JPEG", xExtra, yFotosExtras + 3, 160, 100);
