@@ -404,7 +404,7 @@ function generarReportePDF() {
         doc.rect(margen, margen, maxAncho - (margen * 2), maxAlto - (margen * 2));
         
         // 2. MARCO DEL ENCABEZADO SUPERIOR
-        doc.setLineWidth(0.5);
+        doc.setLineWidth(0.4);
         doc.setDrawColor(22, 35, 47);
         doc.rect(margen + 2, margen + 2, maxAncho - (margen * 2) - 4, 18); // Caja contenedora del header
 
@@ -463,7 +463,7 @@ function generarReportePDF() {
         ["REFERENCIA DE LA VIVIENDA:", document.getElementById("lugar-referencia").value.toUpperCase()]
     ];
 
-    let inicioYTabla = margen + 28;
+    let inicioYTabla = margen + 35;
     let anchoTabla = maxAncho - (margen * 2) - 8; 
     let altoFilaFija = 6.5;
     
