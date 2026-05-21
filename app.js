@@ -562,7 +562,7 @@ function generarReportePDF() {
     if (datosFotos.extras.length > 0) {
         let paginaExtraActiva = 3;
         let conteoFotosPorPagina = 0;
-        let yFotosExtras = margen + 35;
+        let yFotosExtras = margen + 30;
         
         datosFotos.extras.forEach((imgExtra, indice) => {
             if (conteoFotosPorPagina === 0) {
