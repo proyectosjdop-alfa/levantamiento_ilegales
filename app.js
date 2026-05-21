@@ -190,7 +190,7 @@ function convertirLatLngToUTM(lat, lng) {
     let UTMEasting = (k0 * N * (A + (1 - T + C) * A * A * A / 6.0 + (5 - 18 * T + T * T + 72 * C - 58 * eccSquared) * A * A * A * A * A / 120.0) + 500000.0);
     let UTMNorthing = (k0 * (M + N * Math.tan(latRad) * (A * A / 2.0 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24.0 + (61 - 58 * T + T * T + 600 * C - 330 * eccSquared) * A * A * A * A * A * A / 720.0)));
     
-    return `${zone}P E: ${UTMEasting.toFixed(1)} N: ${UTMNorthing.toFixed(1)}`;
+    return `${UTMEasting.toFixed(1)}, ${UTMNorthing.toFixed(1)}`;
 }
 
 function procesarImagenSimple(input, idPreview) {
