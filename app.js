@@ -463,7 +463,7 @@ function generarReportePDF() {
         ["REFERENCIA DE LA VIVIENDA:", document.getElementById("lugar-referencia").value.toUpperCase()]
     ];
 
-    let inicioYTabla = margen + 38;
+    let inicioYTabla = margen + 35;
     let anchoTabla = maxAncho - (margen * 2) - 8; 
     let altoFilaFija = 6.5;
     
@@ -516,7 +516,7 @@ function generarReportePDF() {
     const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2);
 
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO:", xCentradoDNI, yActual, { align: "center" });
+        doc.text("FOTO FRONTAL DNI DEL USUARIO:", maxAncho / 2, yActual, { align: "center" });
         yActual += 2;
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
@@ -525,7 +525,7 @@ function generarReportePDF() {
     }
     
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO:", xCentradoDNI, yActual, { align: "center" });
+        doc.text("FOTO REVERSO DNI DEL USUARIO:", maxAncho / 2, yActual, { align: "center" });
         yActual += 2;
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
@@ -553,7 +553,7 @@ function generarReportePDF() {
     doc.text("FOTO BASE DEL MEDIDOR:", maxAncho / 2, yPag2, { align: "center" });
     if(datosFotos.medidor) {
         let xMedidor = (maxAncho / 2) - 35;
-        doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 70, 100);
+        doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 80, 110);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
         doc.rect(xMedidor, yPag2 + 3, 70, 100);
     }
