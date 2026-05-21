@@ -536,11 +536,11 @@ function generarReportePDF() {
     doc.addPage();
     aplicarMarcoYEncabezadoExcel(2);
 
-    let yPag2 = margen + 25;
+    let yPag2 = margen + 35;
     doc.setFont("helvetica", "bold"); doc.setFontSize(9);
     
     // Foto Fachada: 160 mm × 100 mm con su marco
-    doc.text("FOTO FACHADA: 160 mm × 100 mm", margen + 5, yPag2);
+    doc.text("FOTO FACHADA:", maxAncho / 2, yPag2 + 5, { align: "center" });
     if(datosFotos.fachada) {
         let xFachada = (maxAncho / 2) - 80;
         doc.addImage(datosFotos.fachada, "JPEG", xFachada, yPag2 + 3, 160, 100);
@@ -549,8 +549,8 @@ function generarReportePDF() {
     }
 
     // Foto Medidor: 70 mm × 100 mm con su marco
-    yPag2 += 114;
-    doc.text("FOTO BASE DEL MEDIDOR: 70 mm × 100 mm", margen + 5, yPag2);
+    yPag2 += 130;
+    doc.text("FOTO BASE DEL MEDIDOR:", maxAncho / 2, yPag2 + 5, { align: "center" });
     if(datosFotos.medidor) {
         let xMedidor = (maxAncho / 2) - 35;
         doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 70, 100);
@@ -562,13 +562,13 @@ function generarReportePDF() {
     if (datosFotos.extras.length > 0) {
         let paginaExtraActiva = 3;
         let conteoFotosPorPagina = 0;
-        let yFotosExtras = margen + 25;
+        let yFotosExtras = margen + 35;
         
         datosFotos.extras.forEach((imgExtra, indice) => {
             if (conteoFotosPorPagina === 0) {
                 doc.addPage();
                 aplicarMarcoYEncabezadoExcel(paginaExtraActiva);
-                yFotosExtras = margen + 25;
+                yFotosExtras = margen + 35;
             }
 
             doc.setFont("helvetica", "bold"); doc.setFontSize(9);
@@ -579,7 +579,7 @@ function generarReportePDF() {
             doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.4);
             doc.rect(xExtra, yFotosExtras + 3, 160, 100);
             
-            yFotosExtras += 114;
+            yFotosExtras += 130;
             conteoFotosPorPagina++;
 
             if (conteoFotosPorPagina === 2 && indice < datosFotos.extras.length - 1) {
