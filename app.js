@@ -400,11 +400,11 @@ function generarReportePDF() {
     function aplicarMarcoYEncabezadoExcel(numPagina) {
         // 1. Marco perimetral de la hoja externa
         doc.setDrawColor(22, 35, 47); 
-        doc.setLineWidth(0.6);
+        doc.setLineWidth(0.4);
         doc.rect(margen, margen, maxAncho - (margen * 2), maxAlto - (margen * 2));
         
         // 2. MARCO DEL ENCABEZADO SUPERIOR
-        doc.setLineWidth(0.4);
+        doc.setLineWidth(0.3);
         doc.setDrawColor(22, 35, 47);
         doc.rect(margen + 2, margen + 2, maxAncho - (margen * 2) - 4, 18); // Caja contenedora del header
 
@@ -463,7 +463,7 @@ function generarReportePDF() {
         ["REFERENCIA DE LA VIVIENDA:", document.getElementById("lugar-referencia").value.toUpperCase()]
     ];
 
-    let inicioYTabla = margen + 35;
+    let inicioYTabla = margen + 38;
     let anchoTabla = maxAncho - (margen * 2) - 8; 
     let altoFilaFija = 6.5;
     
@@ -507,7 +507,7 @@ function generarReportePDF() {
     });
 
     // Posición para las fotos de los DNI de forma VERTICAL abajo
-    yActual += 6; 
+    yActual += 15; 
     doc.setFont("helvetica", "bold"); 
     doc.setFontSize(9);
     
@@ -516,16 +516,16 @@ function generarReportePDF() {
     const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2);
 
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        doc.text("FOTO FRONTAL DNI DEL USUARIO:", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
         doc.rect(xCentradoDNI, yActual, anchoDNI, altoDNI); 
-        yActual += altoDNI + 6;
+        yActual += altoDNI + 15;
     }
     
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO: 85.60 mm × 53.98 mm", xCentradoDNI, yActual);
+        doc.text("FOTO REVERSO DNI DEL USUARIO:", xCentradoDNI, yActual);
         yActual += 2;
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
