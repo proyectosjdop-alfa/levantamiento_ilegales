@@ -516,7 +516,7 @@ function generarReportePDF() {
     const xCentradoDNI = (maxAncho / 2) - (anchoDNI / 2);
 
     if(datosFotos.dniFrontal) {
-        doc.text("FOTO FRONTAL DNI DEL USUARIO:", xCentradoDNI, yActual);
+        doc.text("FOTO FRONTAL DNI DEL USUARIO:", xCentradoDNI, yActual, { align: "center" });
         yActual += 2;
         doc.addImage(datosFotos.dniFrontal, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
@@ -525,7 +525,7 @@ function generarReportePDF() {
     }
     
     if(datosFotos.dniRevers) {
-        doc.text("FOTO REVERSO DNI DEL USUARIO:", xCentradoDNI, yActual);
+        doc.text("FOTO REVERSO DNI DEL USUARIO:", xCentradoDNI, yActual, { align: "center" });
         yActual += 2;
         doc.addImage(datosFotos.dniRevers, "JPEG", xCentradoDNI, yActual, anchoDNI, altoDNI);
         doc.setDrawColor(22, 35, 47); doc.setLineWidth(0.3);
@@ -540,7 +540,7 @@ function generarReportePDF() {
     doc.setFont("helvetica", "bold"); doc.setFontSize(9);
     
     // Foto Fachada: 160 mm × 100 mm con su marco
-    doc.text("FOTO FACHADA:", maxAncho / 2, yPag2 + 5, { align: "center" });
+    doc.text("FOTO FACHADA:", maxAncho / 2, yPag2, { align: "center" });
     if(datosFotos.fachada) {
         let xFachada = (maxAncho / 2) - 80;
         doc.addImage(datosFotos.fachada, "JPEG", xFachada, yPag2 + 3, 160, 100);
@@ -550,7 +550,7 @@ function generarReportePDF() {
 
     // Foto Medidor: 70 mm × 100 mm con su marco
     yPag2 += 130;
-    doc.text("FOTO BASE DEL MEDIDOR:", maxAncho / 2, yPag2 + 5, { align: "center" });
+    doc.text("FOTO BASE DEL MEDIDOR:", maxAncho / 2, yPag2, { align: "center" });
     if(datosFotos.medidor) {
         let xMedidor = (maxAncho / 2) - 35;
         doc.addImage(datosFotos.medidor, "JPEG", xMedidor, yPag2 + 3, 70, 100);
